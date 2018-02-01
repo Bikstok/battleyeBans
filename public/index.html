@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="battleyeBans">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Arma 3 BattlEye Ban Checker. Look up BattlEye bans for Arma 3 in bulk requests">
+    <meta name="author" content="Bikstok">
+
+    <title>Arma 3 BattlEye Ban Checker</title>
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/battleye.css">
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+    <script src="assets/js/core.js"></script>
+</head>
+
+<body ng-controller="mainController">
+<header>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <img class="img-responsive" src="assets/img/be.png" alt="">
+                <div class="intro-text">
+                    <h1 class="headline">Arma 3 BattlEye Ban Checker</h1>
+                    <span class="sub-headline">Look up BattlEye bans for Arma 3 in bulk requests</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="loader">
+    <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+</div>
+
+<section>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-6 lookup-input">
+                <form ng-submit="checkSteamIDs()">
+                    <div class="form-group">
+                        <label for="steamids_textarea">
+                            <h3>Check SteamID64</h3>
+                            <span class="small-text">17 digit format. Example: 76561197960332700</span>
+                        </label>
+                        <textarea ng-model="steamids" id="steamids_textarea" class="form-control" rows="10"
+                                  placeholder="Separated multiple steamids with , (comma)"></textarea>
+                    </div>
+                    <button ng-disabled="isBusy" type="submit" class="btn btn-primary btn-lg">Submit</button>
+                </form>
+            </div>
+
+            <div class="col-md-6 lookup-input">
+                <form ng-submit="checkSteamFriends()">
+                    <div class="form-group">
+                        <label for="steamid_friends">
+                            <h3>Check friends of account</h3>
+                            <span class="small-text">URL or SteamID64. Profile must be public</span>
+                        </label>
+                        <input type="text" ng-model="steamid" id="steamid_friends" class="form-control">
+                    </div>
+                    <button ng-disabled="isBusy" type="submit" class="btn btn-primary btn-lg">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row response">
+            <h3><label for="response_textarea">Response</label></h3>
+            <textarea id="response_textarea" class="form-control" rows="10">{{responseFiltered || json}}</textarea>
+
+            <div class="form-group">
+                <input name="fancy-checkbox-primary" id="fancy-checkbox-primary" autocomplete="off" type="checkbox" ng-init="checkStatus=false" ng-model="checkStatus" ng-click="hideCleanAccounts(checkStatus)"/>
+                <div class="btn-group">
+                    <label for="fancy-checkbox-primary" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        <span> </span>
+                    </label>
+                    <label for="fancy-checkbox-primary" class="btn btn-default active">
+                        Hide clean accounts
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="success">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2>About</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-lg-offset-2">
+                <p>This application works by creating a socket connection to BattlEye and sending UDP packets with GUIDs to check if they are banned.
+                    <br/><br/>Only Global Bans active in Arma 3 are listed. However, some old Arma 2 and DayZ bans may appear (pre 2014).
+                </p>
+            </div>
+            <div class="col-lg-4">
+                <p>Banned accounts can be viewed by going to the following url: <a href="https://steamcommunity.com/profiles/" target="_blank">https://steamcommunity.com/profiles/{id}.</a>
+                    <br/><br/>A public REST API is available for developers to use. Every ip-address is limited to 50 requests per 10 minutes and maximum 1000 SteamIDs per request.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2>REST API</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tr>
+                            <th>Method</th>
+                            <th>Path</th>
+                            <th>Parameters</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>/api/check/</td>
+                            <td>steamids (separated with comma)</td>
+                            <td>Check SteamIDs for BattlEye bans in Arma 3. Limited to 500 SteamIDs per call.</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>/api/checkFriends/</td>
+                            <td>steamid</td>
+                            <td>Check friends of SteamID for BattlEye bans in Arma 3</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="text-center">
+    <div class="footer-below">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <a href="https://gitlab.com/users/Bikstok/projects"><img src="assets/img/git.svg" width="32px" height="32px"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "battleyebans",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "rfirevtre",
+  "license": "ISC",
+  "dependencies": {
+    "big-integer": "^1.6.23",
+    "console-stamp": "^0.2.5",
+    "express": "^4.15.3",
+    "express-rate-limit": "^2.9.0",
+    "js-md5": "^0.6.0",
+    "wait-until": "0.0.2"
+  }
+}
