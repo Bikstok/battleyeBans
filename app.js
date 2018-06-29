@@ -22,8 +22,7 @@ var server = app.listen(process.env.PORT || 3000, function () {
 
     console.log('BattlEye Ban Checker is running at %s:%s', host, port);
 
-    //app.use(express.static(__dirname + '/public'));
-    app.use(express.static('../public_html'));
+    app.use(express.static(__dirname + '/public'));
 
     app.get('/api/check/:steamids', function (req, res) {
         try {
