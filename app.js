@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var steamController = require('./controllers/steamController.js')('steam_api_key');
+var steamController = require('./controllers/steamController.js')(process.env.STEAM_API_KEY);
 var RateLimit = require('express-rate-limit');
 var battleyeController = require('./controllers/battleyeController.js')();
 require('console-stamp')(console, 'dd-mm-yyyy HH:MM:ss.l');
