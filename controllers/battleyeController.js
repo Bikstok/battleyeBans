@@ -2,7 +2,6 @@ var md5 = require('js-md5');
 var dgram = require('dgram');
 var bigInt = require('big-integer');
 var waitUntil = require('wait-until');
-var mongoController = require('./mongoController')();
 
 module.exports = function () {
     var battleyeController = {};
@@ -85,16 +84,7 @@ module.exports = function () {
             })
             .done(function (result) {
                 console.log('Finished request.. processedSteamids:' + processedSteamids.length + ', unprocessedSteamids:' + unprocessedSteamids.length);
-
-                var banned = processedSteamids.filter(processed => processed.status !== 'Clean' && processed.status !== 'Invalid SteamID');
-                mongoController.saveMultiple(banned)
-                    .then(() => {
-                        return callback(processedSteamids);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        return callback(processedSteamids);
-                    });
+                return callback(processedSteamids);
             });
 
     };

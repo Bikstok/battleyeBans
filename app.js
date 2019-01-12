@@ -2,7 +2,8 @@ var express = require('express');
 var app = express();
 var steamController = require('./controllers/steamController.js')(process.env.STEAM_API_KEY);
 var RateLimit = require('express-rate-limit');
-var battleyeController = require('./controllers/battleyeController.js')();
+var mongoController = require('./mongoController')();
+var battleyeController = require('./controllers/battleyeController.js')(mongoController);
 require('console-stamp')(console, 'dd-mm-yyyy HH:MM:ss.l');
 
 app.enable('trust proxy');
@@ -35,7 +36,7 @@ var server = app.listen(process.env.PORT || 3000, function () {
                     message: 'You exceeded the maximum limited of 1000 steamids.'
                 });
             } else {
-                battleyeController.checkMultipleIDs(steamids, function (processedSteamids) {
+                check(steamids, function (processedSteamids) {
                     res.json(processedSteamids);
                 });
             }
@@ -54,7 +55,7 @@ var server = app.listen(process.env.PORT || 3000, function () {
             if (parseInt(req.params.steamid).toString().length === 17) {
                 steamController.getFriends(req.params.steamid, function (friends) {
                     if (friends.length > 0) {
-                        battleyeController.checkMultipleIDs(friends, function (processedSteamids) {
+                        check(friends, function (processedSteamids) {
                             res.json(processedSteamids);
                         });
                     } else {
@@ -67,7 +68,7 @@ var server = app.listen(process.env.PORT || 3000, function () {
                     if (typeof steamid !== 'undefined' && steamid !== false) {
                         steamController.getFriends(steamid, function (friends) {
                             if (friends.length > 0) {
-                                battleyeController.checkMultipleIDs(friends, function (processedSteamids) {
+                                check(friends, function (processedSteamids) {
                                     res.json(processedSteamids);
                                 });
                             } else {
@@ -85,4 +86,28 @@ var server = app.listen(process.env.PORT || 3000, function () {
             res.json({message: 'Oops, validation failed.. It is recommended to use SteamIDs in 17 digit format.'});
         }
     });
+
+    app.get('/api/banned', function (req, res) {
+        mongoController.get()
+            .then(banned => {
+                res.json(banned);
+            })
+            .catch(err => {
+                res.json({message: 'Error occured'});
+            });
+    });
 });
+
+var check = function(steamids, callback) {
+    battleyeController.checkMultipleIDs(steamids, processedSteamids => {
+        var banned = processedSteamids.filter(processed => processed.status !== 'Clean' && processed.status !== 'Invalid SteamID');
+        mongoController.saveMultiple(banned)
+            .then(() => {
+                return callback(processedSteamids);
+            })
+            .catch(err => {
+                console.log(err);
+                return callback(processedSteamids);
+            });
+    });
+}

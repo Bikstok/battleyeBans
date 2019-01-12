@@ -56,5 +56,17 @@ module.exports = function () {
         });
     }
 
+    mongoController.get = function() {
+        return new Promise((resolve, reject) => {
+            Banned.find({}, (err, banned) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(banned);
+            });
+        });
+    }
+
     return mongoController;
 };
