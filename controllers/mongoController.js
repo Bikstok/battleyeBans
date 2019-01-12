@@ -1,6 +1,17 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true}, (err) => {
+    if (err) {
+        console.log('MongoDB failed to connect');
+    }
+
+    console.log('Connected to MongoDB');
+
+    let db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'MongoDB error:'));
+});
+
 var schema = Schema({
     guid: {type: String},
     status: {type: String},
