@@ -2,7 +2,7 @@ var md5 = require('js-md5');
 var dgram = require('dgram');
 var bigInt = require('big-integer');
 var waitUntil = require('wait-until');
-var mongoController = require('./mongoController');
+var mongoController = require('./mongoController')();
 
 module.exports = function () {
     var battleyeController = {};
