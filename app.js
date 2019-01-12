@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var steamController = require('./controllers/steamController.js')(process.env.STEAM_API_KEY);
 var RateLimit = require('express-rate-limit');
-var mongoController = require('./mongoController')();
+var mongoController = require('./controllers/mongoController')();
 var battleyeController = require('./controllers/battleyeController.js')(mongoController);
 require('console-stamp')(console, 'dd-mm-yyyy HH:MM:ss.l');
 
