@@ -3,6 +3,7 @@ var app = express();
 var steamController = require('./controllers/steamController.js')(process.env.STEAM_API_KEY);
 var RateLimit = require('express-rate-limit');
 var battleyeController = require('./controllers/battleyeController.js')();
+var mongoose = require('mongoose');
 require('console-stamp')(console, 'dd-mm-yyyy HH:MM:ss.l');
 
 app.enable('trust proxy');
@@ -84,5 +85,16 @@ var server = app.listen(process.env.PORT || 3000, function () {
             console.log(e);
             res.json({message: 'Oops, validation failed.. It is recommended to use SteamIDs in 17 digit format.'});
         }
+    });
+
+    mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true}, (err) => {
+        if (err) {
+            console.log('MongoDB failed to connect');
+        }
+
+        console.log('Connected to MongoDB');
+
+        let db = mongoose.connection;
+        db.on('error', console.error.bind(console, 'MongoDB error:'));
     });
 });
