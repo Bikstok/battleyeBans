@@ -86,7 +86,7 @@ module.exports = function () {
             .done(function (result) {
                 console.log('Finished request.. processedSteamids:' + processedSteamids.length + ', unprocessedSteamids:' + unprocessedSteamids.length);
 
-                var banned = processedSteamids.filter(processed => processed.status !== 'Clean' || processed.status !== 'Invalid SteamID');
+                var banned = processedSteamids.filter(processed => processed.status !== 'Clean' && processed.status !== 'Invalid SteamID');
                 mongoController.saveMultiple(banned)
                     .then(() => {
                         return callback(processedSteamids);
