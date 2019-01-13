@@ -63,7 +63,17 @@ module.exports = function () {
                     return reject(err);
                 }
 
-                resolve(banned);
+                let formatted = [];
+                banned.forEach(ban => {
+                    formatted.push({
+                        guid: ban.guid,
+                        status: ban.status,
+                        first_seen: ban.first_seen,
+                        url: 'https://steamcommunity.com/profiles/' + ban.guid
+                    });
+                });
+
+                resolve(formatted);
             });
         });
     }

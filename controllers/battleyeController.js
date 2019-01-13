@@ -30,7 +30,8 @@ module.exports = function () {
             if (typeof steamid !== 'undefined') {
                 processedSteamids.push({
                     steamid: steamid.steamid,
-                    status: status === '' ? 'Clean' : status
+                    status: status === '' ? 'Clean' : status,
+                    url: 'https://steamcommunity.com/profiles/' + steamid.steamid,
                 });
             }
 
