@@ -10,12 +10,12 @@
   "author": "Bikstok",
   "license": "ISC",
   "dependencies": {
-    "big-integer": "^1.6.23",
-    "console-stamp": "^0.2.5",
-    "express": "^4.15.3",
+    "big-integer": "^1.6.44",
+    "console-stamp": "^0.2.9",
+    "express": "^4.17.1",
     "express-rate-limit": "^2.9.0",
     "js-md5": "^0.6.0",
-    "mongoose": "^5.4.3",
+    "mongoose": "^5.6.4",
     "wait-until": "0.0.2"
   }
 }
